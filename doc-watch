@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# This script is based on this article:
+# https://benjamincongdon.me/blog/2018/08/22/Live-Refreshing-Cargo-Docs/
+
+set -euo pipefail
+
+SUPERPROJECT_ROOT="$(git rev-parse --show-superproject-working-tree)"
+
+cd "${SUPERPROJECT_ROOT}"
+
+# TODO: Add bootstrapping to ensure the crates `cargo-watch` and `https` and the npm package
+# `browser-sync` are installed.
+# TODO: The root of the served page is a directory listing, can we fix?
+cargo watch -s 'cargo doc && browser-sync start --serveStatic target/doc -s target/doc --directory --no-open'
