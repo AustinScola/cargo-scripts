@@ -1,0 +1,9 @@
+#!/bin/bash
+
+set -euo pipefail
+
+SUPERPROJECT_ROOT="$(git rev-parse --show-superproject-working-tree)"
+
+cd "${SUPERPROJECT_ROOT}"
+
+cargo build --release
