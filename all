@@ -2,13 +2,15 @@
 
 set -euo pipefail
 
-REPO_ROOT="$(git rev-parse --show-toplevel)"
-HERE="${REPO_ROOT}/scripts"
+SUPERPROJECT_ROOT="$(git rev-parse --show-superproject-working-tree)"
+if [[ "${SUPERPROJECT_ROOT}" == "" ]]; then
+    SUPERPROJECT_ROOT="$(git rev-parse --show-toplevel)"
+fi
 
-cd "${HERE}"
+cd "${SUPERPROJECT_ROOT}/scripts"
 
-./format.sh
+format
 
-./check.sh
+check
 
-./lint.sh
+lint
