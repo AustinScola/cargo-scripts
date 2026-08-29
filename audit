@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -euo pipefail
+
+SUPERPROJECT_ROOT="$(git rev-parse --show-superproject-working-tree)"
+[[ -n "${SUPERPROJECT_ROOT}" ]] || SUPERPROJECT_ROOT="$(git rev-parse --show-toplevel)"
+echo $SUPERPROJECT_ROOT
+
+source "${SUPERPROJECT_ROOT}/bash-lib/ask_yes_or_no.sh"
+source "${SUPERPROJECT_ROOT}/bash-lib/check_cargo_crate_installed.sh"
+source "${SUPERPROJECT_ROOT}/bash-lib/ensure_brew_formula_installed.sh"
+
+cd "${SUPERPROJECT_ROOT}"
+
+BOOTSTRAP="${BOOTSTRAP:-yes}"
+
+if [[ "${BOOTSTRAP}" == "yes" ]]; then
+    ensure_brew_formula_installed "yq"
+
+    TRUTH_FILE="${SUPERPROJECT_ROOT}/truth.yaml"
+
+    DESIRED_VERSION="$(yq -e '.["cargo-audit"].version' "${TRUTH_FILE}")"
+
+    if [[ "$(check_cargo_crate_installed "cargo-audit" "${DESIRED_VERSION}")" == "no" ]]; then
+        echo "Cargo-audit v${DESIRED_VERSION} is not installed."
+        echo -n "Would you like to install cargo-audit v${DESIRED_VERSION} and continue? "
+        if [[ "$(ask_yes_or_no)" == "no" ]]; then
+            echo "Aborting..."
+            exit 1
+        fi
+        cargo install cargo-audit --locked --version "${DESIRED_VERSION}"
+    fi
+fi
+
+cargo audit
