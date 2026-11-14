@@ -6,6 +6,7 @@
 set -euo pipefail
 
 SUPERPROJECT_ROOT="$(git rev-parse --show-superproject-working-tree)"
+[[ -n "${SUPERPROJECT_ROOT}" ]] || SUPERPROJECT_ROOT="$(git rev-parse --show-toplevel)"
 
 cd "${SUPERPROJECT_ROOT}"
 
